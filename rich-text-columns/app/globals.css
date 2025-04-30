@@ -1,0 +1,65 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.rich-text-content h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #374151;
+}
+
+.rich-text-content p {
+  margin-bottom: 0.75rem;
+}
+
+.rich-text-content ul,
+.rich-text-content ol {
+  margin-bottom: 0.75rem;
+  padding-left: 1.5rem;
+}
+
+.rich-text-content ul {
+  list-style-type: disc;
+}
+
+.rich-text-content ol {
+  list-style-type: decimal;
+}
+
+.rich-text-content a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.rich-text-content blockquote {
+  border-left: 4px solid #e5e7eb;
+  padding-left: 0.75rem;
+  font-style: italic;
+  margin: 0.75rem 0;
+  color: #6b7280;
+}
+
+.rich-text-content strong {
+  font-weight: 600;
+}
+
+.rich-text-content em {
+  font-style: italic;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Cell shading transitions */
+.bg-blue-100\/70,
+.bg-red-100\/70,
+.bg-amber-100\/70,
+.bg-green-100\/70,
+.bg-gray-100\/70 {
+  transition: background-color 0.2s ease-in-out;
+}
