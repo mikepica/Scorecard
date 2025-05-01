@@ -14,9 +14,9 @@ import {
 // Strategic goal mapping
 export const strategicGoalMap = {
   all: "All Strategic Goals",
-  SG1: "Holding the line",
-  SG2: "Letting it go",
-  SG3: "This is the main",
+  SG1: "Scaling Cell Therapy across Oncology",
+  SG2: "Build overall AZ Radioconjugate",
+  SG3: "Build readiness to file",
 }
 
 export type StrategicGoalKey = keyof typeof strategicGoalMap
@@ -45,7 +45,7 @@ export default function StrategicGoal({ onGoalChange }: StrategicGoalProps) {
             <SelectLabel>Strategic Goals</SelectLabel>
             {Object.entries(strategicGoalMap).map(([key, value]) => (
               <SelectItem key={key} value={key}>
-                {key !== "all" ? `${key}: ${value}` : value}
+                {key !== "all" ? `Strategic Goal ${key.slice(-1)}: ${value}` : value}
               </SelectItem>
             ))}
           </SelectGroup>

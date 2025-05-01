@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import type { TableData } from "@/data/table-data"
 import { Card } from "@/components/ui/card"
@@ -33,6 +33,47 @@ export default function RichTextTable({ data, goalFilter }: RichTextTableProps) 
   const [commentDialogOpen, setCommentDialogOpen] = useState(false)
   const [activeCommentCell, setActiveCommentCell] = useState<string | null>(null)
   const [commentText, setCommentText] = useState("")
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Load saved data on component mount
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const response = await fetch('/api/cell-data')
+        const { shadings, comments } = await response.json()
+        setCellShadings(shadings)
+        setCellComments(comments)
+      } catch (error) {
+        console.error('Failed to load cell data:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    loadData()
+  }, [])
+
+  // Save data whenever it changes
+  useEffect(() => {
+    if (!isLoading) {
+      const saveData = async () => {
+        try {
+          await fetch('/api/cell-data', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              shadings: cellShadings,
+              comments: cellComments,
+            }),
+          })
+        } catch (error) {
+          console.error('Failed to save cell data:', error)
+        }
+      }
+      saveData()
+    }
+  }, [cellShadings, cellComments, isLoading])
 
   // Filter rows based on selected strategic goal
   const filteredRows = goalFilter === "all" ? data.rows : data.rows.filter((row) => row.strategicGoal === goalFilter)
@@ -106,8 +147,9 @@ export default function RichTextTable({ data, goalFilter }: RichTextTableProps) 
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[50px]"></TableHead>
-                  {data.columns.map((column) => (
-                    <TableHead key={column.id}>{column.title}</TableHead>
+                  <TableHead className="w-[320px]">Strategic Programs (Objectives)</TableHead>
+                  {data.columns.slice(1).map((column) => (
+                    <TableHead key={column.id} className="w-[200px] text-center">{column.title}</TableHead>
                   ))}
                 </TableRow>
               </TableHeader>
@@ -128,7 +170,7 @@ export default function RichTextTable({ data, goalFilter }: RichTextTableProps) 
                           {isExpanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                         </Button>
                       </TableCell>
-                      {data.columns.map((column) => {
+                      {data.columns.map((column, colIdx) => {
                         const cellId = `${row.id}-${column.id}`
                         const cellContent = row.cells[column.id]
                         const cellShading = cellShadings[cellId] || "none"
@@ -136,7 +178,10 @@ export default function RichTextTable({ data, goalFilter }: RichTextTableProps) 
                         const hasComment = cellComments[cellId] ? true : false
 
                         return (
-                          <TableCell key={`${row.id}-${column.id}`} className={`relative p-0 ${shadingClass}`}>
+                          <TableCell
+                            key={`${row.id}-${column.id}`}
+                            className={`relative p-0 ${shadingClass} ${colIdx === 0 ? "w-[320px]" : "w-[200px] text-center"}`}
+                          >
                             <div className="flex justify-end absolute right-2 top-2 z-10 gap-1">
                               <Button
                                 variant="ghost"
@@ -196,11 +241,10 @@ export default function RichTextTable({ data, goalFilter }: RichTextTableProps) 
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </div>
-                            <div className="p-4">
+                            <div className="p-4 px-6 pr-12">
                               <div
-                                className={`rich-text-content prose prose-sm max-w-none ${
-                                  isExpanded ? "" : "line-clamp-2"
-                                }`}
+                                className={`rich-text-content prose prose-sm max-w-none ${isExpanded ? "" : "line-clamp-2"}`}
+                                style={{ textAlign: colIdx === 0 ? "left" : "center" }}
                               >
                                 <div dangerouslySetInnerHTML={{ __html: cellContent }} />
                               </div>
