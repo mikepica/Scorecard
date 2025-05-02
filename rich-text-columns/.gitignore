@@ -1,5 +1,11 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
+# Specific files to ignore
+strategic-goal.tsx
+cell-data.json
+table-data.json
+
+
 # dependencies
 /node_modules
 /.pnp
