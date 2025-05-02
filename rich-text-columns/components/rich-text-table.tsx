@@ -40,11 +40,17 @@ export default function RichTextTable({ data, goalFilter }: RichTextTableProps) 
     const loadData = async () => {
       try {
         const response = await fetch('/api/cell-data')
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
         const { shadings, comments } = await response.json()
-        setCellShadings(shadings)
-        setCellComments(comments)
+        setCellShadings(shadings || {})
+        setCellComments(comments || {})
       } catch (error) {
         console.error('Failed to load cell data:', error)
+        // Initialize with empty objects if loading fails
+        setCellShadings({})
+        setCellComments({})
       } finally {
         setIsLoading(false)
       }
@@ -57,7 +63,8 @@ export default function RichTextTable({ data, goalFilter }: RichTextTableProps) 
     if (!isLoading) {
       const saveData = async () => {
         try {
-          await fetch('/api/cell-data', {
+          console.log('Saving data:', { shadings: cellShadings, comments: cellComments })
+          const response = await fetch('/api/cell-data', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -67,6 +74,11 @@ export default function RichTextTable({ data, goalFilter }: RichTextTableProps) 
               comments: cellComments,
             }),
           })
+          if (!response.ok) {
+            const errorData = await response.json()
+            throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error}`)
+          }
+          console.log('Data saved successfully')
         } catch (error) {
           console.error('Failed to save cell data:', error)
         }
